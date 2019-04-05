@@ -10,14 +10,14 @@
 #pragma config CP = 0b1 // no code protect
 
 // DEVCFG1
-#pragma config FNOSC = x // use primary oscillator with pll
-#pragma config FSOSCEN = x // turn off secondary oscillator
-#pragma config IESO = x // no switching clocks
-#pragma config POSCMOD = x // high speed crystal mode
-#pragma config OSCIOFNC = x // disable secondary osc
-#pragma config FPBDIV = x // divide sysclk freq by 1 for peripheral bus clock
-#pragma config FCKSM = x // do not enable clock switch
-#pragma config WDTPS = x // use slowest wdt
+#pragma config FNOSC = 0b011 // use primary oscillator with pll
+#pragma config FSOSCEN = 0b0 // turn off secondary oscillator
+#pragma config IESO = 0b0 // no switching clocks
+#pragma config POSCMOD = 0b10 // high speed crystal mode
+#pragma config OSCIOFNC = 0b1 // disable secondary osc
+#pragma config FPBDIV = 0b00 // divide sysclk freq by 1 for peripheral bus clock
+#pragma config FCKSM = 0b11 // do not enable clock switch
+#pragma config WDTPS = 0b10100 // use slowest wdt
 #pragma config WINDIS = 0b1 // wdt no window mode
 #pragma config FWDTEN = 0b0 // wdt disabled
 #pragma config FWDTWINSZ = 0b11 // wdt window at 25%
