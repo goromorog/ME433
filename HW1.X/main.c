@@ -57,8 +57,28 @@ int main() {
 
     __builtin_enable_interrupts();
 
+    TRISB = 0xFFFF;
+    TRISA = 0xFFEF;
+    LATAbits.LATA4 = 1;
+            
+    
     while(1) {
 	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 	// remember the core timer runs at half the sysclk
+
+        _CP0_SET_COUNT(0);
+        LATAbits.LATA4 = 1;
+        while (_CP0_GET_COUNT() < 12000) { //  .0005/((1/48000000)*2){
+        ;
+        }
+        LATAbits.LATA4 = 0;
+        
+        while (_CP0_GET_COUNT() < 24000) { //  .0005/((1/48000000)*2){
+        ;
+        }
+        while (PORTBbits.RB4 == 0){
+            
+        }
+  
     }
 }
