@@ -69,12 +69,12 @@ int main() {
         _CP0_SET_COUNT(0);
         LATAbits.LATA4 = 1;
         while (_CP0_GET_COUNT() < 12000) { //  .0005/((1/48000000)*2){
-        ;
+        
         }
         LATAbits.LATA4 = 0;
         
         while (_CP0_GET_COUNT() < 24000) { //  .0005/((1/48000000)*2){
-        ;
+        
         }
         while (PORTBbits.RB4 == 0){
             
