@@ -1,6 +1,7 @@
 #include<xc.h>           // processor SFR definitions
 #include<sys/attribs.h>  // __ISR macro
 #include<math.h>
+#include "spi.h"
 
 // DEVCFG0
 #pragma config DEBUG = 0b11 // no debugging
@@ -58,12 +59,11 @@ int main() {
 
     __builtin_enable_interrupts();
 
-    TRISB = 0xFFFF;
-    TRISA = 0xFFEF;
-    LATAbits.LATA4 = 1;
-            
-    int i = 0;
+
     initSPI1();
+ 
+    
+    int i = 0;
     float f1;
     float f2;
     
@@ -78,3 +78,5 @@ int main() {
         i++;
         while(_CP0_GET_COUNT() < 2400000000/1000) {}  //check this is 24Million
     }
+
+}
