@@ -52,49 +52,5 @@ unsigned char SPI1_IO(unsigned char write){
 
 
 
-int main(void) {
-  unsigned short addr1 = 0x1234;                  // the address for writing the ram
-  char data[] = "Help, I'm stuck in the RAM!";    // the test message
-  char read[] = "***************************";    // buffer for reading from ram
-  char buf[100];                                  // buffer for comm. with the user
-  unsigned char status;                           // used to verify we set the status 
-  NU32_Startup();   // cache on, interrupts on, LED/button init, UART init
-  ram_init(); 
-
-  // check the ram status
-  CS = 0;
-  spi_io(0x5);                                      // ram read status command
-  status = spi_io(0);                               // the actual status
-  CS = 1;
-
-  sprintf(buf, "Status 0x%x\r\n",status);
-  NU32_WriteUART3(buf);
-
-  sprintf(buf,"Writing \"%s\" to ram at address 0x%x\r\n", data, addr1);
-  NU32_WriteUART3(buf);
-                                                    // write the data to the ram
-  ram_write(addr1, data, strlen(data) + 1);         // +1, to send the '\0' character
-  ram_read(addr1, read, strlen(data) + 1);          // read the data back
-  sprintf(buf,"Read \"%s\" from ram at address 0x%x\r\n", read, addr1);
-  NU32_WriteUART3(buf);
-
-
-	init_spi();
-
-  while(1) {
-	_CPO_SET_COUNT(0);
-	float f = 512 +512*sin(i*2*3.1415/1000*10);  //should make a 10Hz sin wave)
-	i++;
-
-
-
-	setVoltage(0,512);		//test
-	setVoltage(1,256);		//test
-
-	while(_CPO_GET_COUNT() < 2400000000/1000) {}  //check this is 24Million
-    ;
-  }
-  return 0;
-}
 
 

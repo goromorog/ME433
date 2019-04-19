@@ -64,36 +64,17 @@ int main() {
             
     int i = 0;
     initSPI1();
+    float f1;
+    float f2;
     
     while(1) {
-
-        float f1 = 512 +512*sin(i*2*3.1415/1000*10);  //should make a 10Hz sin wave)
+        _CP0_SET_COUNT(0);
+        f1 = 512 +512*sin(i*2*3.1415/1000*10);  //should make a 10Hz sin wave)
+        setVoltage(0, f1);
+        if (i%2 == 0){
+            ;
+        }
         
         i++;
-        setVoltage(0, f);
-        setVoltage(1,)
-
-
-
-	setVoltage(0,512);		//test
-	setVoltage(1,256);		//test
-        
-	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
-	// remember the core timer runs at half the sysclk
-
-        _CP0_SET_COUNT(0);
-        LATAbits.LATA4 = 1;
-        while (_CP0_GET_COUNT() < 12000) { //  .0005/((1/48000000)*2){
-        
-        }
-        LATAbits.LATA4 = 0;
-        
-        while (_CP0_GET_COUNT() < 24000) { //  .0005/((1/48000000)*2){
-        
-        }
-        while (PORTBbits.RB4 == 0){
-            
-        }
-  
+        while(_CP0_GET_COUNT() < 2400000000/1000) {}  //check this is 24Million
     }
-}
