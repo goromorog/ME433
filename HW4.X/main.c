@@ -68,6 +68,8 @@ int main() {
     float f2;
     
     while(1) {
+        
+        /*
         _CP0_SET_COUNT(0);
         f1 = 512 +512*sin(i*2*3.1415/1000*10);  //should make a 10Hz sin wave)
         setVoltage(0, f1);
@@ -77,6 +79,9 @@ int main() {
         
         i++;
         while(_CP0_GET_COUNT() < 2400000000/1000) {}  //check this is 24Million
+         */
+        setVoltage(0, 0b111111111111);
+        setVoltage(1, 0b00000111);
     }
 
 }

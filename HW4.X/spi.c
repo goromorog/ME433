@@ -7,12 +7,12 @@
 void setVoltage(char channel, int voltage) {
 	unsigned short t = 0;
 	t= channel << 15; //channel is at the very end of the data transfer
-	t = t | 0b01110000000000000;
-	t = t | ((voltage&0b1111111111) <<2); //rejecting excessive bits (above 10)
+	t = t | 0b0111000000000000;
+	t = t | ((voltage&0b111111111111) <<2); //rejecting excessive bits (above 12)
 
 	CS = 0;
 	SPI1_IO (t>>8);
-	SPI1_IO(t&0b11111111);
+	SPI1_IO (t&0b11111111);
     CS = 1;
             
 }
