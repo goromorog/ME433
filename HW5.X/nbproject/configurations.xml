@@ -13,8 +13,10 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.c</itemPath>
-      <itemPath>spi.c</itemPath>
-      <itemPath>spi.h</itemPath>
+      <itemPath>i2c_master.c</itemPath>
+      <itemPath>i2c_master.h</itemPath>
+      <itemPath>i2c_expander.c</itemPath>
+      <itemPath>i2c_expander.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -243,7 +245,7 @@
         <property key="memories.instruction.ram.ranges"
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.ranges" value="1d000000-1d01ffff"/>
+        <property key="memories.programmemory.ranges" value="1d000000-1d03ffff"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmentry.voltage" value="low"/>
