@@ -2,9 +2,11 @@
 // The functions must be callled in the correct order as per the I2C protocol
 // Change I2C1 to the I2C channel you are using
 // I2C pins need pull-up resistors, 2k-10k
+#include<xc.h>           // processor SFR definitions
+#include<sys/attribs.h>  // __ISR macro
 
 void i2c_master_setup(void) {
-  I2C2BRG = some number for 100kHz;            // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 
+  I2C2BRG = 90;            // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 (pgd:pulse gobbler bit) 
                                     // look up PGD for your PIC32
   ANSELBbits.ANSB2 = 0; //disabling analog input
   ANSELBbits.ANSB3 = 0;

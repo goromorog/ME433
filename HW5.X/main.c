@@ -1,6 +1,7 @@
 #include<xc.h>           // processor SFR definitions
 #include<sys/attribs.h>  // __ISR macro
 #include "i2c_master.h"
+#include "i2c_expander.h"
 
 // DEVCFG0
 #pragma config DEBUG = 0b11 // no debugging
@@ -66,7 +67,7 @@ int main() {
     while(1) {
 	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 	// remember the core timer runs at half the sysclk
-
+        
         _CP0_SET_COUNT(0);
         LATAbits.LATA4 = 1;
         while (_CP0_GET_COUNT() < 12000) { //  .0005/((1/48000000)*2){
@@ -80,6 +81,13 @@ int main() {
         while (PORTBbits.RB4 == 0){
             
         }
-  
+        i2c_master_setup();
+        initExpander();
+        if (getExpander()>>7 == 0){
+            setExpander(0, 1);
+        }
+        else{
+            setExpander(0, 0);
+        }
     }
 }
