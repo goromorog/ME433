@@ -62,25 +62,28 @@ int main() {
     TRISB = 0xFFFF;
     TRISA = 0xFFEF;
     LATAbits.LATA4 = 1;
+    
 
+    SPI1_init();
+    LCD_init();
+
+    _CP0_SET_COUNT(0);
     
     while(1) {
 	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 	// remember the core timer runs at half the sysclk
 
-        _CP0_SET_COUNT(0);
-        LATAbits.LATA4 = 1;
-        while (_CP0_GET_COUNT() < 12000) { //  .0005/((1/48000000)*2){
-        
+        if (_CP0_GET_COUNT() > 1200000) { //  .0005/((1/48000000)*2){
+            _CP0_SET_COUNT(0);
+            LATAINV = 0b10000;
         }
-        LATAbits.LATA4 = 0;
         
-        while (_CP0_GET_COUNT() < 24000) { //  .0005/((1/48000000)*2){
+        if (PORTBbits.RB4 == 0){
+          LATAbits.LATA4 = 1;  
+        }
         
-        }
-        while (PORTBbits.RB4 == 0){
-            
-        }
-  
+        //LCD_clearScreen(ILI9341_GREEN);
+        LCD_drawLetter('F', 120, 120, ILI9341_GREEN, ILI9341_BLACK);
+        //LCD_drawLetter('F', 10, 10, ILI9341_GREEN, ILI9341_BLACK);
     }
 }

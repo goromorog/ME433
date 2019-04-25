@@ -66,18 +66,13 @@ int main() {
 	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 	// remember the core timer runs at half the sysclk
 
-        _CP0_SET_COUNT(0);
-        LATAbits.LATA4 = 1;
-        while (_CP0_GET_COUNT() < 12000) { //  .0005/((1/48000000)*2){
-        
+        if (_CP0_GET_COUNT() > 1200000) { //  .0005/((1/48000000)*2){
+            _CP0_SET_COUNT(0);
+            LATAINV = 0b10000;
         }
-        LATAbits.LATA4 = 0;
         
-        while (_CP0_GET_COUNT() < 24000) { //  .0005/((1/48000000)*2){
-        
-        }
-        while (PORTBbits.RB4 == 0){
-            
+        if (PORTBbits.RB4 == 0){
+          LATAbits.LATA4 = 1;  
         }
   
     }
