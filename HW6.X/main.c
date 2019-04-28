@@ -2,6 +2,7 @@
 #include<sys/attribs.h>  // __ISR macro
 #include "ili9341.h"
 #include "lcd.h"
+#include<stdio.h>
 
 // DEVCFG0
 #pragma config DEBUG = 0b11 // no debugging
@@ -68,22 +69,70 @@ int main() {
     LCD_init();
 
     _CP0_SET_COUNT(0);
-    
+    LCD_clearScreen(ILI9341_RED);
+            
     while(1) {
 	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 	// remember the core timer runs at half the sysclk
-
+        static int i = 0;
+        char m[100];
+        char b[100];
+        char f[100];
+        static float fps;
+        /*
         if (_CP0_GET_COUNT() > 1200000) { //  .0005/((1/48000000)*2){
             _CP0_SET_COUNT(0);
             LATAINV = 0b10000;
         }
+         
         
         if (PORTBbits.RB4 == 0){
           LATAbits.LATA4 = 1;  
         }
+         */
         
-        //LCD_clearScreen(ILI9341_GREEN);
-        LCD_drawLetter('F', 120, 120, ILI9341_GREEN, ILI9341_BLACK);
-        //LCD_drawLetter('F', 10, 10, ILI9341_GREEN, ILI9341_BLACK);
+        _CP0_SET_COUNT(0);
+        if (i == 0){
+            sprintf(m, "Hello world!   ");
+        }else{
+            sprintf(m, "Hello world! %d", i); 
+        }
+        LCD_print(m, 28, 32, ILI9341_WHITE, ILI9341_BLACK);
+        
+        int j;
+        int jj;
+        for (j = 0; j < i; j++){
+            for (jj = 0; jj < 5; jj++){
+                LCD_drawPixel(20+j, 42+jj, ILI9341_BLUE);
+            }
+        }
+        
+        int k;
+        int kk;
+        for (k = i; k < 100; k++){
+            for (kk = 0; kk < 5; kk++){
+                LCD_drawPixel(20+k, 42+kk, ILI9341_WHITE);
+            }
+        }
+        
+        
+        
+        fps = 24000000.0/_CP0_GET_COUNT();
+        if (i > 98){
+            i=0;
+        }else{
+            i++;
+        }
+        
+        
+        
+        sprintf(f, "FPS = %4.2f", fps);
+        LCD_print(f, 28, 100, ILI9341_WHITE, ILI9341_BLACK);
+        
+        while (!(_CP0_GET_COUNT() > 2400000)) { 
+            ;
+        }
+         
+
     }
 }

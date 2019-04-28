@@ -1,6 +1,7 @@
 #include "ili9341.h"
+#include<stdio.h>
 
-LCD_drawLetter(char letter, unsigned short x, unsigned short y, unsigned short fc, unsigned short bc){
+void LCD_drawLetter(char letter, unsigned short x, unsigned short y, unsigned short fc, unsigned short bc){
     int j;
     int i; 
     for (i = 0; i < 5; i++){
@@ -13,5 +14,13 @@ LCD_drawLetter(char letter, unsigned short x, unsigned short y, unsigned short f
                 LCD_drawPixel(x+i, y+j, bc);
             }
         }
+    }
+}
+
+void LCD_print(char *m, unsigned short x, unsigned short y, unsigned short c1, unsigned short c2){
+    int t = 0;
+    while(m[t]){
+        LCD_drawLetter(m[t], x + t*5, y, c1, c2);
+        t++;
     }
 }
