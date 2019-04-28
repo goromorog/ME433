@@ -1,149 +1,66 @@
-/* ************************************************************************** */
-/** Descriptive File Name
+#include "i2c_master.h"
 
-  @Company
-    Company Name
-
-  @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
-
-  @Description
-    Describe the purpose of this file.
- */
-/* ************************************************************************** */
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: Included Files                                                    */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/* This section lists the other files that are included in this file.
- */
-
-/* TODO:  Include other files here if needed. */
-
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* Section: File Scope or Global Data                                         */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-/* ************************************************************************** */
-/** Descriptive Data Item Name
-
-  @Summary
-    Brief one-line summary of the data item.
+void initIMU(void){
+    i2c_master_start();
+    i2c_master_send(0b11010110); //0b1101011 chip address, writing
+    i2c_master_send(0b00010000); //CTRL1_XL register address
+    i2c_master_send(0b10000010); //ODR_XL=1000 (1.66kHz), FS_XL=00 (2g), BW_XL=00 (400Hz)
+    i2c_master_stop();
     
-  @Description
-    Full description, explaining the purpose and usage of data item.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
+    i2c_master_start();
+    i2c_master_send(0b11010110); //0b1101011 chip address, writing
+    i2c_master_send(0b00010001); //CTRL2_G register address
+    i2c_master_send(0b10001000); //ODR_G3=1000 (1.66kHz), FS_G=10 (1000dps), FS_125=0
+    i2c_master_stop();
     
-  @Remarks
-    Any additional remarks
- */
-int global_data;
+    i2c_master_start();
+    i2c_master_send(0b11010110); //0b1101011 chip address, writing
+    i2c_master_send(0b00010010); //CTRL3_G register address
+    i2c_master_send(0b00000100); //default values with IF_INC=1
+    i2c_master_stop();
+}
 
-
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Local Functions                                                   */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-/* ************************************************************************** */
-
-/** 
-  @Function
-    int ExampleLocalFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Description
-    Full description, explaining the purpose and usage of the function.
-    <p>
-    Additional description in consecutive paragraphs separated by HTML 
-    paragraph breaks, as necessary.
-    <p>
-    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-
-  @Precondition
-    List and describe any required preconditions. If there are no preconditions,
-    enter "None."
-
-  @Parameters
-    @param param1 Describe the first parameter to the function.
+unsigned char readWho(){
+    i2c_master_start();
+    i2c_master_send(0b11010110); //0b1101011 chip address, writing
+    i2c_master_send(0b00001111); //GPIO ADDR 0x09
+    i2c_master_restart();
+    i2c_master_send(0b11010111); //0b1101011 chip address, reading
+    unsigned char r = i2c_master_recv(); //save returned value
+    i2c_master_ack(1);
+    i2c_master_stop();
     
-    @param param2 Describe the second parameter to the function.
+    return r;
+}
 
-  @Returns
-    List (if feasible) and describe the return values of the function.
-    <ul>
-      <li>1   Indicates an error occurred
-      <li>0   Indicates an error did not occur
-    </ul>
-
-  @Remarks
-    Describe any special behavior not described above.
-    <p>
-    Any additional remarks.
-
-  @Example
-    @code
-    if(ExampleFunctionName(1, 2) == 0)
-    {
-        return 3;
-    }
- */
-static int ExampleLocalFunction(int param1, int param2) {
-    return 0;
+void I2C_read_multiple(unsigned char address, unsigned char reg, unsigned char * data, int length){
+    
+    
 }
 
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-// Section: Interface Functions                                               */
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
-// *****************************************************************************
-
-/** 
-  @Function
-    int ExampleInterfaceFunctionName ( int param1, int param2 ) 
-
-  @Summary
-    Brief one-line description of the function.
-
-  @Remarks
-    Refer to the example_file.h interface header for function usage details.
- */
-int ExampleInterfaceFunction(int param1, int param2) {
-    return 0;
+void setExpander(char pin, char level){
+    //level is 0-1
+    //pin is 0-7
+    //per Nick, we're just setting one pin, so ignore reading and just writing
+    
+    i2c_master_start();
+    i2c_master_send(0b01000000);//A0=0, A1=0, A2=0, writing
+    i2c_master_send(0x0A); //OLAT ADDR 0x0A
+    i2c_master_send(level << pin);
+    i2c_master_stop();
 }
 
-
-/* *****************************************************************************
- End of File
- */
+char getExpander(){
+    i2c_master_start();
+    i2c_master_send(0b01000000); //A0=0, A1=0, A2=0, writing
+    i2c_master_send(0x09); //GPIO ADDR 0x09
+    i2c_master_restart();
+    i2c_master_send(0b01000001); //A0=0, A1=0, A2=0, reading
+    char r = i2c_master_recv(); //save returned value
+    i2c_master_ack(1);
+    i2c_master_stop();
+    
+    return r;
+    
+}
