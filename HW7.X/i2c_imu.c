@@ -46,27 +46,59 @@ void I2C_read_multiple(unsigned char address, unsigned char reg, unsigned char *
         i2c_master_ack(0);
     }
     
-    data[length-1] = i2c_master_recv(); //save returned value
+        data[length-1] = i2c_master_recv(); //save returned value
+    
+     
+    
+    /*
+    data[0] = i2c_master_recv(); //save returned value
+    i2c_master_ack(0);
+    
+    data[1] = i2c_master_recv(); //save returned value
+    i2c_master_ack(0);
+    
+    data[2] = i2c_master_recv(); //save returned value
+    i2c_master_ack(0);
+   
+    
+    data[0] = i2c_master_recv(); //save returned value
+    
+    i2c_master_ack(0);
+    data[1] = i2c_master_recv(); //save returned value
+    
+    i2c_master_ack(0);
+    data[2] = i2c_master_recv(); //save returned value
+    
+    i2c_master_ack(0);
+    data[3] = i2c_master_recv(); //save returned value
+    
+    i2c_master_ack(0);
+    data[4] = i2c_master_recv(); //save returned value
+    
+    */
     
     i2c_master_ack(1);
     i2c_master_stop();
+
        
 }
 
-char I2C_read(unsigned char address, unsigned char reg){
-    i2c_master_start();
+unsigned char I2C_read(unsigned char address, unsigned char reg){
+    i2c_master_start(); 
     i2c_master_send(address << 1); //chip address, writing
-    i2c_master_send(reg); 
+    i2c_master_send(reg);
     i2c_master_restart();
     
     i2c_master_send(address << 1 | 1); //chip address, reading
-    char r = i2c_master_recv(); //save returned value
+    //i2c_master_send(0b11010111);
+    unsigned char r = i2c_master_recv(); //save returned value
     
     i2c_master_ack(1);
     i2c_master_stop();
-
+    
     return r;
 }
+
 
 void setExpander(char pin, char level){
     //level is 0-1

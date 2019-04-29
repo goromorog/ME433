@@ -75,6 +75,7 @@ int main() {
     while(1) {
 	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 	// remember the core timer runs at half the sysclk
+        _CP0_SET_COUNT(0);
         static signed short temperature;
         static signed short gyroX;
         static signed short gyroY;
@@ -85,22 +86,16 @@ int main() {
         
         char m[100];
         unsigned char data[14];
-        
-        if ((_CP0_GET_COUNT() > 1200000) && (readWho()==0b01101001)) { //  .0005/((1/48000000)*2){
-            _CP0_SET_COUNT(0);
-            LATAINV = 0b10000;
-        }
-        
-        if (PORTBbits.RB4 == 0){
-          LATAbits.LATA4 = 1;  
-        }
+
+
         signed short who = readWho();
         
         
         
-        /*
         
-        I2C_read_multiple(0b11010110, 0b00100000, data, 14);
+        
+        I2C_read_multiple(0b01101011, 0b00100000, data, 14);
+        
         temperature = (data[1]<<8) | (data[0]);
         gyroX = (data[2]<<8) | (data[3]);
         gyroY = (data[4]<<8) | (data[5]);
@@ -109,28 +104,49 @@ int main() {
         accelY = (data[10]<<8) | (data[11]);
         accelZ = (data[12]<<8) | (data[13]);
 
-        */
+        
         
         sprintf(m, "WHO_AM_I? %d", who); 
         LCD_print(m, 28, 30, ILI9341_WHITE, ILI9341_BLACK);
         
+        /*
+        unsigned char d[14];
         
-        signed short test = I2C_read(0b11010110, 0b00100000);
-        sprintf(m, "test: %d", test); 
+        d[0] = I2C_read(0b01101011, 0b00100010);
+        d[1] = I2C_read(0b01101011, 0b00100011);
+        signed short testx = d[1]<<8 | d[0];
+        sprintf(m, "testx:   %5d", testx); 
         LCD_print(m, 28, 60, ILI9341_WHITE, ILI9341_BLACK);
         
-        signed short test2 = data[1];
-        sprintf(m, "test2: %d", test2); 
+        signed short test0 = data[0];
+        sprintf(m, "test0: %d", test0); 
         LCD_print(m, 28, 70, ILI9341_WHITE, ILI9341_BLACK);
         
-        signed short test3 = data[2];
-        sprintf(m, "test3: %d", test3); 
+        signed short test1 = data[1];
+        sprintf(m, "test1 %d", test1); 
         LCD_print(m, 28, 80, ILI9341_WHITE, ILI9341_BLACK);
         
-        /*
-        sprintf(m, "gyroX: %d", gyroX); 
+        signed short test2 = data[2];
+        sprintf(m, "test2: %d", test2); 
+        LCD_print(m, 28, 90, ILI9341_WHITE, ILI9341_BLACK);
+        
+        signed short test3 = data[3];
+        sprintf(m, "test3: %d", test3); 
         LCD_print(m, 28, 100, ILI9341_WHITE, ILI9341_BLACK);
+        
+        signed short test4= data[4];
+        sprintf(m, "test4 %d", test4); 
+        LCD_print(m, 28, 110, ILI9341_WHITE, ILI9341_BLACK);
         */
+        
+        sprintf(m, "gyroX: %d", gyroX); 
+        LCD_print(m, 28, 200, ILI9341_WHITE, ILI9341_BLACK);
+
+        
+        while (!(_CP0_GET_COUNT() > 2400000)) { 
+            ;
+        }
+        LATAINV = 0b10000;
         
         
     }
