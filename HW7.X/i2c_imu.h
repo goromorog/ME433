@@ -4,6 +4,8 @@
 // helps implement use I2C1 as a master without using interrupts
 void initIMU(void);
 void I2C_read_multiple(unsigned char address, unsigned char reg, unsigned char * data, int length);
+char I2C_read(unsigned char address, unsigned char reg);
+
 
 void setExpander(char pin, char level);
 char getExpander();

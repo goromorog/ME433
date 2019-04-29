@@ -35,25 +35,38 @@ unsigned char readWho(){
 
 void I2C_read_multiple(unsigned char address, unsigned char reg, unsigned char * data, int length){
     i2c_master_start();
-    i2c_master_send(address<<1); //0b1101011 chip address, writing
-    i2c_master_send(reg); //GPIO ADDR 0x09
+    i2c_master_send(address << 1); //chip address, writing
+    i2c_master_send(reg); 
     i2c_master_restart();
-    i2c_master_send((address<<1||1)); //0b1101011 chip address, reading
+    i2c_master_send(address << 1 | 1); //chip address, reading
+    
     int i;
     for (i = 0; i<length-1; i++){
         data[i] = i2c_master_recv(); //save returned value
         i2c_master_ack(0);
     }
+    
     data[length-1] = i2c_master_recv(); //save returned value
     
     i2c_master_ack(1);
     i2c_master_stop();
-    
-    
-    
-    
+       
 }
 
+char I2C_read(unsigned char address, unsigned char reg){
+    i2c_master_start();
+    i2c_master_send(address << 1); //chip address, writing
+    i2c_master_send(reg); 
+    i2c_master_restart();
+    
+    i2c_master_send(address << 1 | 1); //chip address, reading
+    char r = i2c_master_recv(); //save returned value
+    
+    i2c_master_ack(1);
+    i2c_master_stop();
+
+    return r;
+}
 
 void setExpander(char pin, char level){
     //level is 0-1

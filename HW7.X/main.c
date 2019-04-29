@@ -2,6 +2,9 @@
 #include<sys/attribs.h>  // __ISR macro
 #include "i2c_imu.h"
 #include "i2c_master.h"
+#include "ili9341.h"
+#include "lcd.h"
+#include<stdio.h>
 
 // DEVCFG0
 #pragma config DEBUG = 0b11 // no debugging
@@ -65,11 +68,24 @@ int main() {
 
     i2c_master_setup();
     initIMU();
+    SPI1_init();
+    LCD_init();
+    LCD_clearScreen(ILI9341_RED);
     
     while(1) {
 	// use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 	// remember the core timer runs at half the sysclk
-
+        static signed short temperature;
+        static signed short gyroX;
+        static signed short gyroY;
+        static signed short gyroZ;
+        static signed short accelX;
+        static signed short accelY;
+        static signed short accelZ;
+        
+        char m[100];
+        unsigned char data[14];
+        
         if ((_CP0_GET_COUNT() > 1200000) && (readWho()==0b01101001)) { //  .0005/((1/48000000)*2){
             _CP0_SET_COUNT(0);
             LATAINV = 0b10000;
@@ -78,6 +94,44 @@ int main() {
         if (PORTBbits.RB4 == 0){
           LATAbits.LATA4 = 1;  
         }
-  
+        signed short who = readWho();
+        
+        
+        
+        /*
+        
+        I2C_read_multiple(0b11010110, 0b00100000, data, 14);
+        temperature = (data[1]<<8) | (data[0]);
+        gyroX = (data[2]<<8) | (data[3]);
+        gyroY = (data[4]<<8) | (data[5]);
+        gyroZ = (data[6]<<8) | (data[7]);
+        accelX = (data[8]<<8) | (data[9]);
+        accelY = (data[10]<<8) | (data[11]);
+        accelZ = (data[12]<<8) | (data[13]);
+
+        */
+        
+        sprintf(m, "WHO_AM_I? %d", who); 
+        LCD_print(m, 28, 30, ILI9341_WHITE, ILI9341_BLACK);
+        
+        
+        signed short test = I2C_read(0b11010110, 0b00100000);
+        sprintf(m, "test: %d", test); 
+        LCD_print(m, 28, 60, ILI9341_WHITE, ILI9341_BLACK);
+        
+        signed short test2 = data[1];
+        sprintf(m, "test2: %d", test2); 
+        LCD_print(m, 28, 70, ILI9341_WHITE, ILI9341_BLACK);
+        
+        signed short test3 = data[2];
+        sprintf(m, "test3: %d", test3); 
+        LCD_print(m, 28, 80, ILI9341_WHITE, ILI9341_BLACK);
+        
+        /*
+        sprintf(m, "gyroX: %d", gyroX); 
+        LCD_print(m, 28, 100, ILI9341_WHITE, ILI9341_BLACK);
+        */
+        
+        
     }
 }

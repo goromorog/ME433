@@ -132,6 +132,7 @@ int main() {
         while (!(_CP0_GET_COUNT() > 2400000)) { 
             ;
         }
+        LATAINV = 0b10000;
          
 
     }
