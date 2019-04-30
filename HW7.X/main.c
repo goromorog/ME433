@@ -89,13 +89,9 @@ int main() {
 
 
         signed short who = readWho();
-        
-        
-        
-        
-        
-        I2C_read_multiple(0b01101011, 0b00100000, data, 14);
-        
+
+        /*
+        I2C_read_multiple(0b01101011, 0b00100010, data, 4);
         temperature = (data[1]<<8) | (data[0]);
         gyroX = (data[2]<<8) | (data[3]);
         gyroY = (data[4]<<8) | (data[5]);
@@ -103,47 +99,119 @@ int main() {
         accelX = (data[8]<<8) | (data[9]);
         accelY = (data[10]<<8) | (data[11]);
         accelZ = (data[12]<<8) | (data[13]);
-
+        */
         
+        signed int templ = I2C_read(0b01101011, 0b00100000);
+        signed int temph = I2C_read(0b01101011, 0b00100001);
+        temperature = temph<<8 | templ;
+        
+        signed int gyroXl = I2C_read(0b01101011, 0b00100010);
+        signed int gyroXh = I2C_read(0b01101011, 0b00100011);
+        gyroX = gyroXh<<8 | gyroXl;
+        
+        signed int gyroYl = I2C_read(0b01101011, 0b00100100);
+        signed int gyroYh = I2C_read(0b01101011, 0b00100101);
+        gyroY = gyroYh<<8 | gyroYl;
+        
+        signed int gyroZl = I2C_read(0b01101011, 0b00100110);
+        signed int gyroZh = I2C_read(0b01101011, 0b00100111);
+        gyroZ = gyroZh<<8 | gyroZl;
+        
+        signed int accelXl = I2C_read(0b01101011, 0b00101000);
+        signed int accelXh = I2C_read(0b01101011, 0b00101001);
+        accelX = accelXh<<8 | accelXl;
+        
+        signed int accelYl = I2C_read(0b01101011, 0b00101010);
+        signed int accelYh = I2C_read(0b01101011, 0b00101011);
+        accelY = accelYh<<8 | accelYl;
+        
+        signed int accelZl = I2C_read(0b01101011, 0b00101100);
+        signed int accelZh = I2C_read(0b01101011, 0b00101101);
+        accelZ = accelZh<<8 | accelZl;
         
         sprintf(m, "WHO_AM_I? %d", who); 
         LCD_print(m, 28, 30, ILI9341_WHITE, ILI9341_BLACK);
         
-        /*
-        unsigned char d[14];
-        
-        d[0] = I2C_read(0b01101011, 0b00100010);
-        d[1] = I2C_read(0b01101011, 0b00100011);
-        signed short testx = d[1]<<8 | d[0];
-        sprintf(m, "testx:   %5d", testx); 
-        LCD_print(m, 28, 60, ILI9341_WHITE, ILI9341_BLACK);
-        
-        signed short test0 = data[0];
-        sprintf(m, "test0: %d", test0); 
-        LCD_print(m, 28, 70, ILI9341_WHITE, ILI9341_BLACK);
-        
-        signed short test1 = data[1];
-        sprintf(m, "test1 %d", test1); 
-        LCD_print(m, 28, 80, ILI9341_WHITE, ILI9341_BLACK);
-        
-        signed short test2 = data[2];
-        sprintf(m, "test2: %d", test2); 
-        LCD_print(m, 28, 90, ILI9341_WHITE, ILI9341_BLACK);
-        
-        signed short test3 = data[3];
-        sprintf(m, "test3: %d", test3); 
-        LCD_print(m, 28, 100, ILI9341_WHITE, ILI9341_BLACK);
-        
-        signed short test4= data[4];
-        sprintf(m, "test4 %d", test4); 
-        LCD_print(m, 28, 110, ILI9341_WHITE, ILI9341_BLACK);
-        */
-        
-        sprintf(m, "gyroX: %d", gyroX); 
-        LCD_print(m, 28, 200, ILI9341_WHITE, ILI9341_BLACK);
 
         
-        while (!(_CP0_GET_COUNT() > 2400000)) { 
+        sprintf(m, "Temperature: %5d", temperature); 
+        LCD_print(m, 28, 50, ILI9341_WHITE, ILI9341_BLACK);
+        sprintf(m, "gyroX: %5d", gyroX); 
+        LCD_print(m, 28, 60, ILI9341_WHITE, ILI9341_BLACK);
+        sprintf(m, "gyroY: %5d", gyroY); 
+        LCD_print(m, 28, 70, ILI9341_WHITE, ILI9341_BLACK);
+        sprintf(m, "gyroZ: %5d", gyroZ); 
+        LCD_print(m, 28, 80, ILI9341_WHITE, ILI9341_BLACK);
+        
+        sprintf(m, "accelX: %5d", accelX); 
+        LCD_print(m, 28, 90, ILI9341_WHITE, ILI9341_BLACK);
+        sprintf(m, "accelY: %5d", accelY); 
+        LCD_print(m, 28, 100, ILI9341_WHITE, ILI9341_BLACK);
+        sprintf(m, "accelZ: %5d", accelZ); 
+        LCD_print(m, 28, 110, ILI9341_WHITE, ILI9341_BLACK);
+        
+        signed int propX = accelX/170;
+        signed int propY = accelY/170;
+        
+        if (propX>0){
+            int j;
+            int jj;
+            for (j = 0; j < propX; j++){
+                for (jj = 0; jj < 5; jj++){
+                    LCD_drawPixel(120+j, 160+jj, ILI9341_BLUE);
+                }
+            }
+
+            int k;
+            int kk;
+            for (k = propX; k < 100; k++){
+                for (kk = 0; kk < 5; kk++){
+                    LCD_drawPixel(120+k, 160+kk, ILI9341_WHITE);
+                }
+            }
+            
+            int l;
+            int ll;
+            for (l = -100; l <0; l++){
+                for (ll = 0; ll < 5; ll++){
+                    LCD_drawPixel(120+l, 160+ll, ILI9341_WHITE);
+                }
+            }
+            
+        }
+        
+        if (propX<0){
+            int j;
+            int jj;
+            for (j = -100; j < propX; j++){
+                for (jj = 0; jj < 5; jj++){
+                    LCD_drawPixel(120+j, 160+jj, ILI9341_WHITE);
+                }
+            }
+
+            int k;
+            int kk;
+            for (k = propX; k < 0; k++){
+                for (kk = 0; kk < 5; kk++){
+                    LCD_drawPixel(120+k, 160+kk, ILI9341_BLUE);
+                }
+            }
+            
+            int l;
+            int ll;
+            for (l = 0; l < 100; l++){
+                for (ll = 0; ll < 5; ll++){
+                    LCD_drawPixel(120+l, 160+ll, ILI9341_WHITE);
+                }
+            }
+        }
+        
+        
+
+
+        
+        
+        while (!(_CP0_GET_COUNT() > 1200000)) { 
             ;
         }
         LATAINV = 0b10000;

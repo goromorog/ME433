@@ -46,9 +46,12 @@ void I2C_read_multiple(unsigned char address, unsigned char reg, unsigned char *
         i2c_master_ack(0);
     }
     
-        data[length-1] = i2c_master_recv(); //save returned value
     
-     
+    data[length-1] = i2c_master_recv(); //save returned value
+    
+    i2c_master_ack(1);
+    i2c_master_stop();
+
     
     /*
     data[0] = i2c_master_recv(); //save returned value
@@ -77,8 +80,6 @@ void I2C_read_multiple(unsigned char address, unsigned char reg, unsigned char *
     
     */
     
-    i2c_master_ack(1);
-    i2c_master_stop();
 
        
 }
@@ -98,6 +99,7 @@ unsigned char I2C_read(unsigned char address, unsigned char reg){
     
     return r;
 }
+
 
 
 void setExpander(char pin, char level){
