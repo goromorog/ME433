@@ -207,6 +207,58 @@ int main() {
         }
         
         
+        if (propY>0){
+            int j;
+            int jj;
+            for (j = 0; j < propY; j++){
+                for (jj = 0; jj < 5; jj++){
+                    LCD_drawPixel(120+jj, 160+j, ILI9341_BLUE);
+                }
+            }
+
+            int k;
+            int kk;
+            for (k = propY; k < 100; k++){
+                for (kk = 0; kk < 5; kk++){
+                    LCD_drawPixel(120+kk, 160+k, ILI9341_WHITE);
+                }
+            }
+            
+            int l;
+            int ll;
+            for (l = -100; l <0; l++){
+                for (ll = 0; ll < 5; ll++){
+                    LCD_drawPixel(120+ll, 160+l, ILI9341_WHITE);
+                }
+            }
+            
+        }
+        
+        if (propY<0){
+            int j;
+            int jj;
+            for (j = -100; j < propY; j++){
+                for (jj = 0; jj < 5; jj++){
+                    LCD_drawPixel(120+jj, 160+j, ILI9341_WHITE);
+                }
+            }
+
+            int k;
+            int kk;
+            for (k = propY; k < 0; k++){
+                for (kk = 0; kk < 5; kk++){
+                    LCD_drawPixel(120+kk, 160+k, ILI9341_BLUE);
+                }
+            }
+            
+            int l;
+            int ll;
+            for (l = 0; l < 100; l++){
+                for (ll = 0; ll < 5; ll++){
+                    LCD_drawPixel(120+ll, 160+l, ILI9341_WHITE);
+                }
+            }
+        }
 
 
         
