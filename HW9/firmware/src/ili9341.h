@@ -196,6 +196,7 @@ static const char ASCII[96][5] = {
 // spi pins
 #define CS LATBbits.LATB7
 #define DC LATBbits.LATB15
+#define CS2 LATAbits.LATA0
 
 
 // functions
