@@ -179,6 +179,7 @@ void APP_Tasks ( void )
             LCD_print(m, 20, 30, ILI9341_WHITE, ILI9341_BLACK);
             sprintf(m, "zraw: %5d", z);
             LCD_print(m, 20, 40, ILI9341_WHITE, ILI9341_BLACK);
+            
             unsigned short xpix = ((x - 200)/15.4);//x: 200 => 0, 3900 => 240      
             unsigned short ypix = ((3900-y)/11.25);//y: 3900 => 0, 300 => 320
             if (z > 100){
@@ -195,7 +196,25 @@ void APP_Tasks ( void )
             }
             
             static signed int count = 0;
-            count = count + incrementButton(xpix, ypix);
+            static int currentPress = 0;
+            static int pastPress = 0;
+            static signed int xpixpast;
+            static signed int ypixpast;
+            if (z > 100){
+                currentPress = 1;
+                xpixpast = xpix;
+                ypixpast = ypix;
+                        
+            }
+            if (z < 100){
+                currentPress = 0;
+            }
+            if ((pastPress == 1) && (currentPress == 0)){
+                count = count + incrementButton(xpixpast, ypixpast);
+            }
+            
+            pastPress = currentPress;
+
             sprintf(m, "I = %3d", count);
             LCD_print(m, 120, 210, ILI9341_WHITE, ILI9341_BLACK);
             
