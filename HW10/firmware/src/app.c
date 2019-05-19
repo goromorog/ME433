@@ -425,8 +425,8 @@ void APP_Tasks(void) {
             /* Check if a character was received or a switch was pressed.
              * The isReadComplete flag gets updated in the CDC event handler. */
 
-             /* WAIT FOR 5HZ TO PASS OR UNTIL A LETTER IS RECEIVED */
-            if (appData.isReadComplete || _CP0_GET_COUNT() - startTime > (48000000 / 2 / 5)) {
+             /* WAIT FOR 100HZ TO PASS OR UNTIL A LETTER IS RECEIVED */
+            if (appData.isReadComplete || _CP0_GET_COUNT() - startTime > (48000000 / 2 / 100)) {
                 appData.state = APP_STATE_SCHEDULE_WRITE;
             }
 
@@ -623,10 +623,10 @@ void APP_Tasks(void) {
                     }
                 }
             }
-
-            while (!(startTime - _CP0_GET_COUNT() < 240000)) { 
+/*
+            while (!(_CP0_GET_COUNT() - startTime > 240000)) { 
                         ;
-                    }
+                    }*/
             LATAINV = 0b10000;
             
                     
@@ -649,7 +649,7 @@ void APP_Tasks(void) {
                 startTime = _CP0_GET_COUNT(); // reset the timer for acurate delays
             }
             */
-            if ((appData.readBuffer[0] = 'r') && (i < 101)) {
+            if ((appData.readBuffer[0] == 'r') && (i < 101)) {
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                         &appData.writeTransferHandle,
                         dataOut, len,
