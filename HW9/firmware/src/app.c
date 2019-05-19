@@ -218,9 +218,11 @@ void APP_Tasks ( void )
             sprintf(m, "I = %3d", count);
             LCD_print(m, 120, 210, ILI9341_WHITE, ILI9341_BLACK);
             
+           
             while (!(_CP0_GET_COUNT() > 2400000)) { 
             ;
             }
+             
             LATAINV = 0b10000;
             break;
         }

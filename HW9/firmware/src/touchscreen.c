@@ -48,11 +48,11 @@ void initButtons(){
 }
 
 signed int incrementButton(unsigned short x, unsigned short y){
-    if ((x > 120) && (x < 150)){
-        if ((y > 155) && (y < 190)){
+    if ((x > 120) && (x < 165)){
+        if ((y > 145) && (y < 190)){
             return 1;
         }
-        else if ((y > 240) && (y < 270)){
+        else if ((y > 230) && (y < 265)){
             return -1;
         }
     }
