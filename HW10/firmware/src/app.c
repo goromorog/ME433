@@ -64,6 +64,12 @@ uint8_t APP_MAKE_BUFFER_DMA_READY dataOut[APP_READ_BUFFER_SIZE];
 uint8_t APP_MAKE_BUFFER_DMA_READY readBuffer[APP_READ_BUFFER_SIZE];
 int len, i = 0;
 int startTime = 0; // to remember the loop time
+int maf[10];
+int fir[10];
+float fir_weights[6];
+float iir_old_weight;
+float iir_new_weight;
+
 
 // *****************************************************************************
 /* Application Data
@@ -343,11 +349,22 @@ void APP_Initialize(void) {
     LCD_init();
     LCD_clearScreen(ILI9341_RED);
     startTime = _CP0_GET_COUNT();
-    int maf[10] = {0};
-    int fir[10] = {0};
-    
+    int jj;
+    for (jj = 0; jj < FILTERCOUNT; jj++)
+        maf[jj] = 16000;
+        fir[jj] = 16000;
+
     //5Hz cutoff: 100 Hz sample rate -> 50Hz Nyquist -> 0.1 of Nyquist is 5Hz
-    // from Matlab: fir1(5, 0.1) =     0.0264, 0.1405, 0.3331, 0.3331, 0.1405, 0.0264
+    // from Matlab: fir1(5, 0.1):
+    fir_weights[0] = 0.0264;
+    fir_weights[1] = 0.1405;
+    fir_weights[2] = 0.3331;
+    fir_weights[3] = 0.3331;
+    fir_weights[4] = 0.1405;
+    fir_weights[5] = 0.0264;
+    
+    iir_old_weight = 0.8;
+    iir_new_weight = 0.2;
 }
 
 /******************************************************************************
@@ -634,10 +651,27 @@ void APP_Tasks(void) {
             while (!(_CP0_GET_COUNT() - startTime > 240000)) { 
                         ;
                     }*/
+            maf[i%FILTERCOUNT] = accelZ;
+            fir[i%FILTERCOUNT] = accelZ * fir_weights[i%FILTERCOUNT];
+            
+            float maf_result = 0;
+            float fir_result = 0;
+            static float iir_result = 16000;
+            int ii;
+            for (ii = 0; ii < FILTERCOUNT; ii ++){
+                maf_result += maf[ii];
+                fir_result += fir[ii];
+            }
+            maf_result = maf_result/FILTERCOUNT;
+            
+            iir_result = iir_result*iir_old_weight + accelZ*iir_new_weight;
+            
+            
+            
             LATAINV = 0b10000;
             
                     
-            len = sprintf(dataOut, "%d %d %d %d\r\n", i, accelZ, maf_result, iir_result, fir_result);
+            len = sprintf(dataOut, "%d %d %d %d %d\r\n", i, accelZ, maf_result, iir_result, fir_result);
             i++; // increment the index so we see a change in the text
             /* IF A LETTER WAS RECEIVED, ECHO IT BACK SO THE USER CAN SEE IT */
            
