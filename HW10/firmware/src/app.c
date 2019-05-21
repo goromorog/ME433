@@ -343,6 +343,11 @@ void APP_Initialize(void) {
     LCD_init();
     LCD_clearScreen(ILI9341_RED);
     startTime = _CP0_GET_COUNT();
+    int maf[10] = {0};
+    int fir[10] = {0};
+    
+    //5Hz cutoff: 100 Hz sample rate -> 50Hz Nyquist -> 0.1 of Nyquist is 5Hz
+    // from Matlab: fir1(5, 0.1) =     0.0264, 0.1405, 0.3331, 0.3331, 0.1405, 0.0264
 }
 
 /******************************************************************************
@@ -450,7 +455,7 @@ void APP_Tasks(void) {
             AND REMEMBER THE NUMBER OF CHARACTERS IN len */
             /* THIS IS WHERE YOU CAN READ YOUR IMU, PRINT TO THE LCD, ETC */
             
-            
+            /*
 
             static signed short temperature;
             static signed short gyroX;
@@ -458,13 +463,14 @@ void APP_Tasks(void) {
             static signed short gyroZ;
             static signed short accelX;
             static signed short accelY;
+             */
             static signed short accelZ;
 
             char m[100];
             unsigned char data[14];
 
             signed short who = readWho();
-
+/*
             signed int templ = I2C_read(0b01101011, 0b00100000);
             signed int temph = I2C_read(0b01101011, 0b00100001);
             temperature = temph<<8 | templ;
@@ -489,6 +495,7 @@ void APP_Tasks(void) {
             signed int accelYh = I2C_read(0b01101011, 0b00101011);
             accelY = accelYh<<8 | accelYl;
 
+ */
             signed int accelZl = I2C_read(0b01101011, 0b00101100);
             signed int accelZh = I2C_read(0b01101011, 0b00101101);
             accelZ = accelZh<<8 | accelZl;
@@ -497,7 +504,7 @@ void APP_Tasks(void) {
             LCD_print(m, 28, 30, ILI9341_WHITE, ILI9341_BLACK);
 
 
-
+/*
             sprintf(m, "Temperature: %5d", temperature); 
             LCD_print(m, 28, 50, ILI9341_WHITE, ILI9341_BLACK);
             sprintf(m, "gyroX: %5d", gyroX); 
@@ -511,9 +518,10 @@ void APP_Tasks(void) {
             LCD_print(m, 28, 90, ILI9341_WHITE, ILI9341_BLACK);
             sprintf(m, "accelY: %5d", accelY); 
             LCD_print(m, 28, 100, ILI9341_WHITE, ILI9341_BLACK);
+ */
             sprintf(m, "accelZ: %5d", accelZ); 
             LCD_print(m, 28, 110, ILI9341_WHITE, ILI9341_BLACK);
-
+/*
             signed int propX = accelX/170;
             signed int propY = accelY/170;
 
@@ -623,14 +631,13 @@ void APP_Tasks(void) {
                     }
                 }
             }
-/*
             while (!(_CP0_GET_COUNT() - startTime > 240000)) { 
                         ;
                     }*/
             LATAINV = 0b10000;
             
                     
-            len = sprintf(dataOut, "%d %d %d %d %d %d %d\r\n", i, accelX, accelY, accelZ, gyroX, gyroY, gyroZ);
+            len = sprintf(dataOut, "%d %d %d %d\r\n", i, accelZ, maf_result, iir_result, fir_result);
             i++; // increment the index so we see a change in the text
             /* IF A LETTER WAS RECEIVED, ECHO IT BACK SO THE USER CAN SEE IT */
            
