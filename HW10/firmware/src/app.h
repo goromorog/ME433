@@ -224,6 +224,7 @@ void APP_Initialize ( void );
 
 void APP_Tasks( void );
 
+#define FILTERCOUNT 10
 
 #endif /* _APP_H */
 
