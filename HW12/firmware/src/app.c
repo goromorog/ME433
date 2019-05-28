@@ -255,6 +255,8 @@ void APP_Initialize(void) {
     //appData.emulateMouse = true;
     appData.hidInstance = 0;
     appData.isMouseReportSendBusy = false;
+    
+    TRISA = 0xFFEF;
 }
 
 /******************************************************************************
@@ -274,6 +276,7 @@ void APP_Tasks(void) {
             /* Application's initial state. */
         case APP_STATE_INIT:
         {
+             
             /* Open the device layer */
             appData.deviceHandle = USB_DEVICE_Open(USB_DEVICE_INDEX_0,
                     DRV_IO_INTENT_READWRITE);
@@ -296,9 +299,10 @@ void APP_Tasks(void) {
             /* Check if the device is configured. The 
              * isConfigured flag is updated in the
              * Device Event Handler */
-
+               LATAbits.LATA4 = 1;
             if (appData.isConfigured) {
                 appData.state = APP_STATE_MOUSE_EMULATE;
+                
             }
             break;
 
