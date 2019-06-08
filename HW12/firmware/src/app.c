@@ -317,6 +317,7 @@ void APP_Tasks(void) {
             // every 50th loop, or 20 times per second
 
             static signed short accelX;
+            static signed short accelY;
 
             char m[100];
             signed short who = readWho();
@@ -325,24 +326,28 @@ void APP_Tasks(void) {
             signed int accelXl = I2C_read(0b01101011, 0b00101000);
             signed int accelXh = I2C_read(0b01101011, 0b00101001);
             accelX = accelXh<<8 | accelXl;
-
-            sprintf(m, "WHO_AM_I? %d", who); 
-            LCD_print(m, 28, 30, ILI9341_WHITE, ILI9341_BLACK);
-
-            sprintf(m, "accelX: %5d", accelX); 
-            LCD_print(m, 28, 90, ILI9341_WHITE, ILI9341_BLACK);
-                
-            static int iir_result = 16000;
-            iir_result = iir_result*iir_old_weight + accelX*iir_new_weight;
             
+            signed int accelYl = I2C_read(0b01101011, 0b00101010);
+            signed int accelYh = I2C_read(0b01101011, 0b00101011);
+            accelY = accelYh<<8 | accelYl;
+
+           
+            static int iir_resultx = 0;
+            iir_resultx = iir_resultx*iir_old_weight + accelX*iir_new_weight;
+            static int iir_resulty = 0;
+            iir_resulty = iir_resulty*iir_old_weight + accelY*iir_new_weight;
+            int x, y;
+            x = (int)iir_resultx*100/160000;
+            y = (int)iir_resulty*100/160000;
+                 
           
             
             appData.mouseButton[0] = MOUSE_BUTTON_STATE_RELEASED;
             appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
             
-            if ((inc >= 1) && (abs(iir_result) > 1000)){
-                appData.xCoordinate = (int8_t) iir_result/30;
-                appData.yCoordinate = (int8_t) iir_result/30;
+            if (inc >= 10){ //&& (abs(iir_resultx)+abs(iir_resulty) > 1000)){
+                appData.xCoordinate = (int8_t) x;
+                appData.yCoordinate = (int8_t) y;
                 LATAINV = 0b10000;
                 inc = 0;
                 
