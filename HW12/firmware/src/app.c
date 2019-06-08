@@ -74,7 +74,8 @@ APP_DATA appData;
 /* Mouse Report */
 MOUSE_REPORT mouseReport APP_MAKE_BUFFER_DMA_READY;
 MOUSE_REPORT mouseReportPrevious APP_MAKE_BUFFER_DMA_READY;
-
+float iir_old_weight;
+float iir_new_weight;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -255,8 +256,17 @@ void APP_Initialize(void) {
     //appData.emulateMouse = true;
     appData.hidInstance = 0;
     appData.isMouseReportSendBusy = false;
-    
+    TRISB = 0xFFFF;
     TRISA = 0xFFEF;
+    LATAbits.LATA4 = 1;
+
+    i2c_master_setup();
+    initIMU();
+    SPI1_init();
+    LCD_init();
+    LCD_clearScreen(ILI9341_RED);
+    iir_old_weight = 0.8;
+    iir_new_weight = 0.2;
 }
 
 /******************************************************************************
@@ -267,16 +277,13 @@ void APP_Initialize(void) {
  */
 
 void APP_Tasks(void) {
-    static int8_t vector = 0;
-    static uint8_t movement_length = 0;
-    int8_t dir_table[] = {-4, -4, -4, 0, 4, 4, 4, 0};
 
+    static uint8_t inc = 0;
     /* Check the application's current state. */
     switch (appData.state) {
             /* Application's initial state. */
         case APP_STATE_INIT:
         {
-             
             /* Open the device layer */
             appData.deviceHandle = USB_DEVICE_Open(USB_DEVICE_INDEX_0,
                     DRV_IO_INTENT_READWRITE);
@@ -299,24 +306,55 @@ void APP_Tasks(void) {
             /* Check if the device is configured. The 
              * isConfigured flag is updated in the
              * Device Event Handler */
-               LATAbits.LATA4 = 1;
+
             if (appData.isConfigured) {
                 appData.state = APP_STATE_MOUSE_EMULATE;
-                
             }
             break;
 
-        case APP_STATE_MOUSE_EMULATE:
+        case APP_STATE_MOUSE_EMULATE: ;
             
             // every 50th loop, or 20 times per second
-            if (movement_length > 50) {
-                appData.mouseButton[0] = MOUSE_BUTTON_STATE_RELEASED;
-                appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
-                appData.xCoordinate = (int8_t) dir_table[vector & 0x07];
-                appData.yCoordinate = (int8_t) dir_table[(vector + 2) & 0x07];
-                vector++;
-                movement_length = 0;
+
+            static signed short accelX;
+
+            char m[100];
+            signed short who = readWho();
+            
+
+            signed int accelXl = I2C_read(0b01101011, 0b00101000);
+            signed int accelXh = I2C_read(0b01101011, 0b00101001);
+            accelX = accelXh<<8 | accelXl;
+
+            sprintf(m, "WHO_AM_I? %d", who); 
+            LCD_print(m, 28, 30, ILI9341_WHITE, ILI9341_BLACK);
+
+            sprintf(m, "accelX: %5d", accelX); 
+            LCD_print(m, 28, 90, ILI9341_WHITE, ILI9341_BLACK);
+                
+            static int iir_result = 16000;
+            iir_result = iir_result*iir_old_weight + accelX*iir_new_weight;
+            
+          
+            
+            appData.mouseButton[0] = MOUSE_BUTTON_STATE_RELEASED;
+            appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
+            
+            if ((inc >= 1) && (abs(iir_result) > 1000)){
+                appData.xCoordinate = (int8_t) iir_result/30;
+                appData.yCoordinate = (int8_t) iir_result/30;
+                LATAINV = 0b10000;
+                inc = 0;
+                
+            } else{
+                appData.xCoordinate = (int8_t) 0;
+                appData.yCoordinate = (int8_t) 0;
+                inc++;
             }
+            
+
+
+            
 
             if (!appData.isMouseReportSendBusy) {
                 /* This means we can send the mouse report. The
@@ -368,7 +406,6 @@ void APP_Tasks(void) {
                             sizeof (MOUSE_REPORT));
                     appData.setIdleTimer = 0;
                 }
-                movement_length++;
             }
 
             break;

@@ -53,6 +53,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "mouse.h"
+#include "i2c_imu.h"
+#include "i2c_master.h"
+#include "ili9341.h"
+#include "lcd.h"
+#include<stdio.h>
 
 // *****************************************************************************
 // *****************************************************************************

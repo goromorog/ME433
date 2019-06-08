@@ -195,4 +195,8 @@ build/default/production/_ext/639803181/sys_clk_pic32mx.o:  \
  ../../../../../../../../microchip/harmony/v2_06/framework/usb/src/usb_device_function_driver.h  \
  ../../../../../../../../microchip/harmony/v2_06/framework/usb/usb_hid.h  \
  ../src/app.h  \
-../src/mouse.h 
+../src/mouse.h  \
+../src/i2c_imu.h  \
+../src/i2c_master.h  \
+ ../src/ili9341.h  \
+../src/lcd.h 
