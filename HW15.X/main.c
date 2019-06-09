@@ -39,34 +39,34 @@
 #pragma config FUSBIDIO = 0b1 // USB pins controlled by USB module
 #pragma config FVBUSONIO = 0b1 // USB BUSON controlled by USB module
 
-#define NUMSAMPS 1000	//number of points in waveform
 
 
 void __ISR(_TIMER_3_VECTOR, IPL5SOFT) Timer3ISR(void){
 	static int counter = 0;			//initialize counter once
 	
-	OC1RS = 2400*counter/100;
-	
+	OC4RS = 2399*counter/200;
+	LATAINV = 0b10000;
 	counter++;							//add one to counter every time ISR is entered
-	if (counter >= 100){
+	if (counter >= 200){
 		counter = 0;	//rollover counter over when end of waveform reached
-        LATAINV = 0b10000;
+       
     }
 
 	IFS0bits.T3IF = 0; 
 
 }
 
-
+//USING OC4 INSTEAD OF OC1 BECAUSE NO OPEN PINS
 int main() {
     T2CONbits.TCKPS = 0;     // Timer2 prescaler N=1 (1:1)
     PR2 = 2399;              // PR = PBCLK / N / desiredF - 1
+    //48000000 = pbclk, desiredf = 20000
     TMR2 = 0;                // initial TMR2 count is 0
-    OC1CONbits.OCM = 0b110;  // PWM mode without fault pin; other OC1CON bits are defaults
-    OC1RS = 0;             // duty cycle = OC1RS/(PR2+1)
-    OC1R = 0;              // initialize before turning OC1 on; afterward it is read-only
+    OC4CONbits.OCM = 0b110;  // PWM mode without fault pin; other OC1CON bits are defaults
+    OC4RS = 0;             // duty cycle = OC1RS/(PR2+1)
+    OC4R = 0;              // initialize before turning OC1 on; afterward it is read-only
     T2CONbits.ON = 1;        // turn on Timer2
-    OC1CONbits.ON = 1;       // turn on OC1
+    OC4CONbits.ON = 1;       // turn on OC1
     __builtin_disable_interrupts();
 
     // set the CP0 CONFIG register to indicate that kseg0 is cacheable (0x3)
@@ -84,10 +84,14 @@ int main() {
     // do your TRIS and LAT commands here
     
   //INT step 3: setup peripheral
-    PR3 = 2399;                    //             set period register
+    //set OC4 to pin RPB13
+    RPB13Rbits.RPB13R = 0b0101;
+    
+    T3CONbits.TCKPS = 0b100; //timer3 prescaler of 32
+    //PR = 48000000/32/100 -1 = 14999
+    PR3 = 14999;                    //             set period register
     TMR3 = 0;                       //             initialize count to 0
-    T3CONbits.TCKPS = 1;            //             set prescaler to 2
-
+   
 
     T3CONbits.ON = 1;               //             turn on Timer2
     IPC3bits.T3IP = 5;              // INT step 4: priority
